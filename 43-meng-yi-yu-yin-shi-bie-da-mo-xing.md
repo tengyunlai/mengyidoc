@@ -4,7 +4,7 @@
 
 # 调用地址
 
-> [http://chunfengai.top:8000/cv/tou\_seg](http://chunfengai.top:8000/cv/tou_seg)
+> http://chunfengai.top:8000/asr/rec
 
 # **请求体**
 
@@ -12,60 +12,35 @@
 
 ```py
 {
-    'image':"base64///////",  #必要的
-    'location':0,             #必要的
-    'age':20,
-    'weight':65,  
-    'height':180,
-    'sex':'M'/'F'
+    'audio':"audio base64 encode///////",  #必要的
 }
 ```
 
 | 名称 | 类别 | 备注 |
 | :--- | :--- | :--- |
-| image | string | 必须有 图片的base64编码 |
-| location | int | 必须有 0代表舌面1代表舌下 |
-| weight | int | 单位是kg |
-| height | int | 单位是cm |
-| sex | string | M/F |
+| Audio | string | 必须有 音频文件的base64编码 |
 
 # **返回**
 
 ```py
 {
-    'success': 0,    
-    'info':'拍摄距离过远',
-    'error':0
+    'code': 200,    
+    'ori_res':'但合成文本',
+    'results': '撰写合成文本'
 }
 ```
 
 | 名称 | 类型 | 备注 |
 | :--- | :--- | :--- |
-| success | int | 成功1失败0 |
-| info | string | 中文错误原因 |
-| error | int | 见下方表格 |
-
-**说明：**
-
-**在拍摄舌面照片时，若检测到拍摄的为舌底照片，返回：请拍摄舌面照片；**
-
-**在拍摄舌底照片时，若检测到拍摄的为舌面照片，返回：请拍摄舌底照片；**
-
-| **错误原因** | **错误码** |
-| :--- | :--- |
-| 无异常 | 0 |
-| 距离过远 | 1 |
-| 拍摄不清晰 | 2 |
-| 舌头未伸出 | 3 |
-| 请拍摄舌面照片/请拍摄舌底照片 | 4 |
-| 传入图像损坏 | 5 |
-| 其他错误 | 6 |
+| code | int | 成功200 错误500 |
+| ori_res | string | 语音模型结果 |
+| results | string | 萌医语音大模型语音识别结果 |
 
 # **调用代码--python**
 
 第一步鉴权，获得加密key：
 
-```py
+```python
 import base64,json,requests
 # 以下为鉴权部分
 username = "***username***" # 替换成你的用户名
@@ -83,16 +58,16 @@ authorization_token = response.json()['data']['token'] #这里是加密key
 
 第二步调用，获得识别结果：
 
-```py
+```python
 #以下为获得key之后的调用部分
-url = 'http://chunfengai.top:8000/cv/tou_seg'
-img_path = '1cb6e1a3f71558387e06690846377f05.jpeg'
+url = 'http://chunfengai.top:8000/asr/rec'
+audio_path = 'output.wav'
 headers = {
     'Authorization': authorization_token #这里是加密key
 }
-with open(img_path, 'rb') as f:
-    base64image = base64.b64encode(f.read()).decode('utf-8') 
-request_param = {'image':base64image,'age':18,'location':0} 
+with open(audio_path, 'rb') as f:
+    base64audio = base64.b64encode(f.read()).decode('utf-8') 
+request_param = {'audio':base64audio} 
 req = requests.post(url, json=json.dumps(request_param),headers=headers)
 print(req.json())
 # 输出：{'curTime': 1715841851092, 'error': 0, 'info': '无异常', 'success': 1}
@@ -143,46 +118,43 @@ fetch('http://chunfengai.top:8000/auth/login', {
 第二步调用，获得识别结果：
 
 ```js
-// 以下为获得key之后的调用部分
-const url = 'http://chunfengai.top:8000/cv/tou_seg';
-const img_path = '1cb6e1a3f71558387e06690846377f05.jpeg';
-const authorization_token = '你的授权token'; // 替换成您的授权token
+const fetch = require('node-fetch'); // 使用node-fetch库来发送HTTP请求
+const fs = require('fs'); // 使用fs库来读写文件
+const { promisify } = require('util'); // 用于将回调函数转换为Promise
+const readFileAsync = promisify(fs.readFile); // 将fs.readFile转换为Promise形式
 
-// 读取图像文件并进行 base64 编码
-let base64image;
-const fs = require('fs');
-fs.readFile(img_path, 'binary', (err, file) => {
-  if (err) {
-    console.error(err);
-    return;
-  }
-  base64image = Buffer.from(file, 'binary').toString('base64');
-  // 构建请求参数
-  const request_param = {
-    image: base64image,
-    age: 18,
-    location: 0
-  };
+const url = 'http://chunfengai.top:8000/asr/rec';
+const audioPath = 'output.wav';
+const headers = {
+    'Authorization': authorizationToken // 这里的变量名改为camelCase以符合JavaScript的命名习惯
+};
 
-  // 发送 POST 请求
-  fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': authorization_token,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(request_param)
-  })
-  .then(response => response.json())
-  .then(data => {
-    // 请求成功，打印响应内容
-    console.log(data);
-  })
-  .catch(error => {
-    // 请求失败，打印错误信息
-    console.error('Error:', error);
-  });
-});
+(async () => {
+    try {
+        // 读取文件并转换为Base64编码
+        const fileBuffer = await readFileAsync(audioPath);
+        const base64Audio = fileBuffer.toString('base64');
+        
+        // 设置请求参数
+        const requestParam = { audio: base64Audio };
+        
+        // 发送POST请求
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': headers['Authorization'],
+                'Content-Type': 'application/json' // 设置请求头以告知发送的是JSON数据
+            },
+            body: JSON.stringify(requestParam) // 请求体为JSON字符串
+        });
+        
+        // 解析响应内容
+        const result = await response.json();
+        console.log(result);
+    } catch (error) {
+        console.error('请求失败:', error);
+    }
+})();
 ```
 
 # **调用代码--Bash**
@@ -201,22 +173,18 @@ curl --location --request GET 'http://chunfengai.top:8000/auth/login' \
 #!/bin/bash
 
 # 替换成您的模型接口地址和加密key
-url='http://chunfengai.top:8000/cv/tou_seg'
-img_path='1cb6e1a3f71558387e06690846377f05.jpeg'
+url='http://chunfengai.top:8000/asr/rec'
+audio_path='1.wav'
 authorization_token='你的授权token' # 替换成您的授权token
 
 # 读取图像文件并进行 base64 编码
-base64image=$( base64 "$img_path" )
+base64audio=$( base64 "$audio_path" )
 
 # 构建请求参数
 request_param=$( jq -n \
-  --arg image "$base64image" \
-  --arg age 18 \
-  --arg location 0 \
+  --arg audio "$base64audio" \
   '{
-    image: $image,
-    age: $age,
-    location: $location
+    audio: $audio,
   }' )
 
 # 发送 POST 请求
@@ -227,10 +195,4 @@ curl -X POST "$url" \
 
 # 如果需要检查响应，可以添加响应处理的代码
 ```
-
-# 测试样例
-
-### 
-
-
 
