@@ -20,7 +20,7 @@
 ## 4. 大模型API
 
 * [4.1 方思基座大模型](41-fang-si-ji-zuo-da-mo-xing.md)
-* 4.2 萌医大模型
+* [4.2 萌医大模型](42-meng-yi-da-mo-xing.md)
 * [4.3 萌医语音识别大模型](43-meng-yi-yu-yin-shi-bie-da-mo-xing.md)
 
 ## 5. 智能舌诊API
