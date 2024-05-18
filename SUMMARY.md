@@ -25,10 +25,10 @@
 
 ## 5. 智能舌诊API
 
-* [5.1 舌诊安全性检测](she-xiang-tu-pian-an-quan-xing-jian-ce-jie-kou.md)
-* [5.2 智能舌诊报告生成](51-she-zhen-an-quan-xing-jian-ce.md)
+* [5.1 舌诊安全性检测](51-she-zhen-an-quan-xing-jian-ce.md)
+* [5.2 智能舌诊报告生成](52-zhi-neng-she-zhen-bao-gao-sheng-cheng.md)
 
 ## 6. 医疗OCR API
 
-* [6.1 医疗检验报告单OCR](zhong-yi-she-zhen-jie-kou.md)
+* [6.1 医疗检验报告单OCR](61-yi-liao-bao-gao-dan-ocr.md)
 
