@@ -25,8 +25,8 @@
 ```py
 {
     'code': 200,    
-    'ori_res':'但合成文本',
-    'results': '撰写合成文本'
+    'ori_res':'萌医语音识别大模型',
+    'results': '萌医语音识别大模型'
 }
 ```
 
@@ -35,6 +35,13 @@
 | code | int | 成功200 错误500 |
 | ori_res | string | 语音模型结果 |
 | results | string | 萌医语音大模型语音识别结果 |
+
+## 注意：
+
+1. 只接受小于或等于1分钟的音频文件，若上传的音频文件大于1分钟，则返回错误。
+2. 只接受mp3，wav音频编码格式的音频文件，无法读取acc
+
+ 
 
 # **调用代码--python**
 
@@ -70,7 +77,7 @@ with open(audio_path, 'rb') as f:
 request_param = {'audio':base64audio} 
 req = requests.post(url, json=json.dumps(request_param),headers=headers)
 print(req.json())
-# 输出：{'curTime': 1715841851092, 'error': 0, 'info': '无异常', 'success': 1}
+# 输出：{'code': 200,    'ori_res':'萌医语音识别大模型','results': '萌医语音识别大模型'}
 ```
 
 # **调用代码--JS**
