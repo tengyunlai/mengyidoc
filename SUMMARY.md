@@ -15,7 +15,7 @@
 
 * [3.1 注册登录](31-zhu-ce-deng-lu.md)
 * [3.2 企业认证](32-qi-ye-ren-zheng.md)
-* [3.3 调用鉴权](diao-yong-jian-quan-shuo-ming.md)
+* [3.3 调用鉴权](33-diao-yong-jian-quan.md)
 
 ## 4. 大模型API
 
