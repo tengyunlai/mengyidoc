@@ -31,11 +31,11 @@
 
 # **返回**
 
-```py
+```python
 {
     'success': 0,    
     'info':'拍摄距离过远',
-    'error':0
+    'error':1
 }
 ```
 

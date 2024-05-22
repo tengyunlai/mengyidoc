@@ -10,7 +10,7 @@
 
 #### 接口地址：
 
-[http://chunfengai.top:8000](http://chunfengai.top:8000)
+[http://chunfengai.top:8000/auth/login](http://chunfengai.top:8000/auth/login)
 
 #### 接口参数：
 

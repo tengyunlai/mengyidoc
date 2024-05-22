@@ -188,11 +188,11 @@
 
 返回的JSON中一共包括三个key：
 
-**checkList**：舌象12维特征的检测识别结果
+**checkList**：舌象12维特征的检测识别结果，以JSON形式返回。
 
-**report**：包含舌象特征检测识别结果及对应特征的中医含义，同时也包括裂纹、齿痕、瘀点、瘀斑的特征分割图
+**report**：包含舌象特征检测识别结果及对应特征的中医含义，同时也包括裂纹、齿痕、瘀点、瘀斑的特征分割图，以JSON形式返回。
 
-**report\_desc**：舌象识别之后的报告描述文本
+**report\_desc**：舌象识别之后的报告描述文本，文本中包括该舌象图片的所有特征描述，以String形式返回。
 
 ## **checkList中的key和value**
 
@@ -215,12 +215,13 @@
 
 | **序号** | **名称** | **对应key** | **类型** | **备注** |
 | :--- | :--- | :--- | :--- | :--- |
-| 1 | 舌形 | tongueList | List | 以JSON形式返回该图片中出现的每一种舌形以及其对应的描述，以及AI检测的结果图片（如有） |
-| 2 | 舌苔 | coatingNatureList | List | 以JSON的形式返回该图片中出现的每一种舌苔特征以及其对应的描述 |
-| 3 | 苔质 | coatingValue |  |  |
-|  |  |  |  |  |
-
-
+| 1 | 舌形 | tongueShapeList | List | 以JSON形式返回该图片中出现的每一种舌形以及其对应的描述，以及AI检测的结果图片（如有）。 |
+| 2 | 舌苔 | coatingNatureList | List | 以JSON的形式返回该图片中出现的每一种舌苔特征以及其对应的描述。 |
+| 3 | 苔色 | mossColor | JSON | 苔色字典，包括苔色和其对应的描述。 |
+| 4 | 舌色 | tongueColor | JSON | 舌色字典，包括舌色和其对应的描述。 |
+| 5 | 舌尖 | tipTongue | JSON | 舌尖特征字典，包括舌尖特征和其对应的描述。 |
+| 6 | 津液 | bodyFluid | JSON | 津液特征字典，包括津液特征和其对应的描述。 |
+| 7 | 舌下脉络 | sublingualCollaterals | JSON | （可选）（如上传舌下照片则有）舌下脉络特征字典，包括舌下脉络特征和其对应的描述。 |
 
 
 
@@ -228,7 +229,7 @@
 
 第一步鉴权，获得加密key：
 
-```py
+```python
 import base64,json,requests
 # 以下为鉴权部分
 username = "***username***" # 替换成你的用户名
@@ -246,19 +247,21 @@ authorization_token = response.json()['data']['token'] #这里是加密key
 
 第二步调用，获得识别结果：
 
-```py
+```python
 #以下为获得key之后的调用部分
-url = 'http://chunfengai.top:8000/cv/tou_seg'
-img_path = '1cb6e1a3f71558387e06690846377f05.jpeg'
+url = 'http://chunfengai.top:8000/cv/baogao'
+img_path_shemian = 'sheshang.jpeg'
+img_path_shexia = 'shexia.jpeg'
 headers = {
     'Authorization': authorization_token #这里是加密key
 }
-with open(img_path, 'rb') as f:
-    base64image = base64.b64encode(f.read()).decode('utf-8') 
-request_param = {'image':base64image,'age':18,'location':0} 
+with open(img_path_shemian, 'rb') as f:
+    base64image_shemian = base64.b64encode(f.read()).decode('utf-8')
+with open(img_path_shexia, 'rb') as f:
+    base64image_shexia = base64.b64encode(f.read()).decode('utf-8')
+request_param = {'image_0':base64image_shemian,'image_1':base64image_shexia} 
 req = requests.post(url, json=json.dumps(request_param),headers=headers)
 print(req.json())
-# 输出：{'curTime': 1715841851092, 'error': 0, 'info': '无异常', 'success': 1}
 ```
 
 # **调用代码--JS**
@@ -306,46 +309,35 @@ fetch('http://chunfengai.top:8000/auth/login', {
 第二步调用，获得识别结果：
 
 ```js
-// 以下为获得key之后的调用部分
-const url = 'http://chunfengai.top:8000/cv/tou_seg';
-const img_path = '1cb6e1a3f71558387e06690846377f05.jpeg';
-const authorization_token = '你的授权token'; // 替换成您的授权token
+// 引入axios库，如果尚未安装，请使用npm install axios进行安装
+const axios = require('axios');
 
-// 读取图像文件并进行 base64 编码
-let base64image;
-const fs = require('fs');
-fs.readFile(img_path, 'binary', (err, file) => {
-  if (err) {
-    console.error(err);
-    return;
-  }
-  base64image = Buffer.from(file, 'binary').toString('base64');
-  // 构建请求参数
-  const request_param = {
-    image: base64image,
-    age: 18,
-    location: 0
-  };
+// 定义URL和headers
+const url = 'http://chunfengai.top:8000/cv/baogao';
+const headers = {
+    'Authorization': 'authorization_token' // 这里替换为您的加密key
+};
 
-  // 发送 POST 请求
-  fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': authorization_token,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(request_param)
-  })
-  .then(response => response.json())
-  .then(data => {
-    // 请求成功，打印响应内容
-    console.log(data);
-  })
-  .catch(error => {
-    // 请求失败，打印错误信息
-    console.error('Error:', error);
-  });
-});
+// 定义base64编码的图片数据，这里需要替换为您的实际图片数据
+const base64image_shemian = 'base64image_shemian'; // 请替换为您的实际base64图片数据
+const base64image_shexia = 'base64,base64image_shexia'; // 请替换为您的实际base64图片数据
+
+// 构建请求参数
+const requestParam = {
+    'image_0': base64image_shemian,
+    'image_1': base64image_shexia
+};
+
+// 发送POST请求
+axios.post(url, requestParam, { headers: headers })
+    .then(response => {
+        // 请求成功，打印响应数据
+        console.log(response.data);
+    })
+    .catch(error => {
+        // 请求失败，打印错误信息
+        console.error('Error during request to ' + url, error);
+    });
 ```
 
 # **调用代码--Bash**
@@ -363,32 +355,36 @@ curl --location --request GET 'http://chunfengai.top:8000/auth/login' \
 ```bash
 #!/bin/bash
 
-# 替换成您的模型接口地址和加密key
-url='http://chunfengai.top:8000/cv/tou_seg'
-img_path='1cb6e1a3f71558387e06690846377f05.jpeg'
-authorization_token='你的授权token' # 替换成您的授权token
+# 定义URL和Authorization token
+url='http://chunfengai.top:8000/cv/baogao'
+authorization_token='your_authorization_token_here' # 替换为您的加密key
 
-# 读取图像文件并进行 base64 编码
-base64image=$( base64 "$img_path" )
+# 图片文件路径
+img_path_shemian='sheshang.jpeg'
+img_path_shexia='shexia.jpeg'
+
+# 读取图片文件并转换为base64编码
+base64image_shemian=$(base64 $img_path_shemian | tr -d '\n')
+base64image_shexia=$(base64 $img_path_shexia | tr -d '\n')
 
 # 构建请求参数
-request_param=$( jq -n \
-  --arg image "$base64image" \
-  --arg age 18 \
-  --arg location 0 \
-  '{
-    image: $image,
-    age: $age,
-    location: $location
-  }' )
+request_param=$(jq -n \
+  --arg img0 "$base64image_shemian" \
+  --arg img1 "$base64image_shexia" \
+  '{image_0: $img0, image_1: $img1}')
 
-# 发送 POST 请求
-curl -X POST "$url" \
-     -H "Authorization: $authorization_token" \
-     -H "Content-Type: application/json" \
-     -d "$request_param"
+# 发送POST请求
+response=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+  -H "Authorization: $authorization_token" \
+  -H "Content-Type: application/json" \
+  -d "$request_param" \
+  "$url")
 
-# 如果需要检查响应，可以添加响应处理的代码
+# 打印响应状态码
+echo "Response Status Code: $response"
+
+# 如果需要打印响应内容，可以取消下面注释行
+# echo "Response Content: $response"
 ```
 
 
