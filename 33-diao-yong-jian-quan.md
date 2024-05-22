@@ -6,6 +6,8 @@
 
 ### 调用鉴权服务api获取加密key
 
+![未命名绘图.drawio](./assets/未命名绘图.drawio.png)
+
 #### 接口地址：
 
 [http://chunfengai.top:8000](http://chunfengai.top:8000)
