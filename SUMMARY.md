@@ -9,7 +9,6 @@
 * [2.1 版本日志](21-ban-ben-ri-zhi.md)
 * [2.2 术语表](22-zhu-yu-biao.md)
 * [2.3 数据枚举](23-shu-ju-mei-ju.md)
-* [2.4 错误码](24-cuo-wu-ma.md)
 
 ## 3. 接入流程
 
